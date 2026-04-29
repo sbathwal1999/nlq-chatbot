@@ -1,4 +1,4 @@
-# Use the official lightweight PostgreSQL image.
+# Use the official lightweight PostgreSQL image
 # Alpine variant keeps the image small.
 FROM postgres:16-alpine
 
