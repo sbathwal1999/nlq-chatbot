@@ -1,0 +1,48 @@
+services:
+
+  # ── PostgreSQL ──────────────────────────────────────────────────────────────
+  postgres:
+    build:
+      context: ./postgres       # Uses postgres/Dockerfile which copies init.sql
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB}
+    ports:
+      - "5432:5432"             # Expose for local inspection (e.g. psql, DBeaver)
+    volumes:
+      - postgres_data:/var/lib/postgresql/data   # Persist data across restarts
+    healthcheck:
+      # Wait until PostgreSQL is actually ready before the app tries to connect
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── Chainlit App ────────────────────────────────────────────────────────────
+  app:
+    build:
+      context: ./app            # Uses app/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "8000:8000"             # Chat UI available at http://localhost:8000
+    environment:
+      # DB connection — matches the postgres service above
+      POSTGRES_HOST:     postgres  # Docker DNS: service name resolves inside the network
+      POSTGRES_PORT:     5432
+      POSTGRES_USER:     ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB:       ${POSTGRES_DB}
+      # Groq API key — get yours free at https://console.groq.com
+      GROQ_API_KEY:      ${GROQ_API_KEY}
+      # Cap rows per query to avoid overwhelming the LLM context window
+      MAX_ROWS:          ${MAX_ROWS:-50}
+      # Groq model ID — override in .env to swap models without rebuilding
+      GROQ_MODEL:        ${GROQ_MODEL:-llama-3.3-70b-versatile}
+    depends_on:
+      postgres:
+        condition: service_healthy   # Don't start until DB is ready
+
+volumes:
+  postgres_data:    # Named volume so DB data survives container rebuilds
