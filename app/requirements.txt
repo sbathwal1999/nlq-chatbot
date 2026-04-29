@@ -1,0 +1,10 @@
+# Mirrors pyproject.toml dependencies — keep in sync when adding packages.
+# Used by Docker (uv pip install --system -r requirements.txt).
+
+chainlit>=1.0.0
+langchain>=0.2.0
+langchain-community>=0.2.0
+langchain-groq>=0.1.0
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.0
+pydantic>=2.0.0

@@ -1,0 +1,15 @@
+[project]
+name = "nlq-chatbot"
+version = "0.1.0"
+description = "Natural language query chatbot over PostgreSQL using Chainlit + LangChain + Groq"
+requires-python = ">=3.11"
+
+dependencies = [
+    "chainlit>=1.0.0",           # Chat UI framework
+    "langchain>=0.2.0",          # LLM orchestration
+    "langchain-community>=0.2.0",# create_sql_agent + SQLDatabase live here
+    "langchain-groq>=0.1.0",     # Groq LLM integration for LangChain
+    "psycopg2-binary>=2.9.9",    # PostgreSQL driver
+    "sqlalchemy>=2.0.0",         # Database abstraction (used by LangChain)
+    "pydantic>=2.0.0",           # SecretStr for safe API key handling
+]
